@@ -6,3 +6,4 @@ dependencies:
     - ipykernel
     - pandas
     - seaborn
+    - pydytuesday
