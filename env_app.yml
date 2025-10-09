@@ -1,4 +1,4 @@
-name: g501-environment # This is misnamed and the environment is therefore misnamed in the ipython kernel selection
+name: h501-gutenberg
 dependencies:
   - python=3.13
   - pip
