@@ -1,21 +1,24 @@
 import pandas as pd
 
-def list_authors():
+def list_authors(by_languages=False, alias=False):
+    """ Function to list authors from Project Gutenberg dataset. """
 
-    # Setup and read-in all CSV files
-    gutenberg_authors = r"C:\Users\martchfr\OneDrive - Indiana University\Graduate School\MIS\INFO-H 501\Projects\h501-gutenberg\tt_gutenberg\gutenberg_authors.csv"
-    gutenberg_metadata = r"C:\Users\martchfr\OneDrive - Indiana University\Graduate School\MIS\INFO-H 501\Projects\h501-gutenberg\tt_gutenberg\gutenberg_metadata.csv"
-    authors_df = pd.read_csv(gutenberg_authors)
-    metadata_df = pd.read_csv(gutenberg_metadata)
+    # Setup and read-in all CSV files from project gutenberg
+    authors_df = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-06-03/gutenberg_authors.csv')
+    languages_df = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-06-03/gutenberg_languages.csv')
+    metadata_df = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-06-03/gutenberg_metadata.csv')
+    subjects_df = pd.read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-06-03/gutenberg_subjects.csv')
 
-    # Merge Dataframes
-    metadata_w_authors_df = pd.merge(metadata_df, authors_df, on="gutenberg_author_id")
-    metadata_w_authors_df["translation_count"] = 1
+    # Merge Dataframes together 
+    metadata_language_df = pd.merge(metadata_df, languages_df, on="gutenberg_id")
+    metadata_w_authors_df = (pd.merge(metadata_language_df, authors_df, on="gutenberg_author_id"))
 
+    # Aggregate total languages per author based on works
     grouped_df = metadata_w_authors_df.groupby(
-        ["gutenberg_author_id", "alias"], as_index=False
-        ).agg(sum_translation_count=("translation_count", "sum")).sort_values(by="sum_translation_count", ascending=False)
+            ["gutenberg_author_id", "author_x","alias"], as_index=False
+            ).agg(sum_language_count=("total_languages", "sum")).sort_values(by="sum_language_count", ascending=False)
 
-    author_list_descending = list(grouped_df["alias"])
-        
-    return author_list_descending
+    if alias == False:
+        return list(grouped_df["author_x"])
+    else:
+        return list(grouped_df["alias"])
